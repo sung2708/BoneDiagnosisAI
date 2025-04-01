@@ -1,248 +1,239 @@
-import os
+from tqdm import tqdm
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.optim.lr_scheduler import ReduceLROnPlateau
-from tqdm import tqdm
 import numpy as np
+import os
+import json
+import re
+import collections
+import cv2
+from PIL import Image
+import torchvision.transforms as transforms
+from transformers import AutoModel, AutoTokenizer
+from random import choice
+from torch.utils.data import Dataset, DataLoader
+from ..configs import MODEL_CONFIG
+from ..models.base_model import mod_model1, mod_model2, mod_model3, mod_yn_model1
 
-# Constants and configurations
-class Config:
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    lr = 1e-4
-    batch_size = 32
-    max_len = 128
-    gen_len = 64
-    epochs = 50
-    clip = True
-    save_dir = "./saved_models/"
-    threshold = 2.0  # Loss threshold for saving models
+# Define models
+batch_size = MODEL_CONFIG.batch_size
 
-    # Create save directory if not exists
-    os.makedirs(save_dir, exist_ok=True)
 
-# Model training functions
-class Trainer:
-    def __init__(self, model, optimizer, scheduler, config):
-        self.model = model.to(config.device)
-        self.optimizer = optimizer
-        self.scheduler = scheduler
-        self.config = config
+# Initialize PhoBERT
+phobert = AutoModel.from_pretrained("vinai/phobert-base-v2")
+tokenizer = AutoTokenizer.from_pretrained("vinai/phobert-base-v2")
 
-    def get_loss(self, batch, mode='class'):
-        if mode == 'class':
-            imag_name, tokens, segment_ids, input_mask, classes = zip(*batch)
-            logits_clsf = self.model(imag_name, tokens, segment_ids, input_mask)
-            loss_clsf = nn.CrossEntropyLoss()(logits_clsf, torch.cuda.LongTensor(classes))
-            return loss_clsf
+# Image and Mask transformations
+image_transform = transforms.Compose([
+    transforms.Resize((224, 224)),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+])
+
+mask_transform = transforms.Compose([
+    transforms.Resize((224, 224)),
+    transforms.ToTensor(),
+])
+
+class MedicalDataset(Dataset):
+    def __init__(self, image_paths, questions, answers, label_dir, image_dir):
+        self.image_paths = image_paths
+        self.questions = questions
+        self.answers = answers
+        self.label_dir = label_dir
+        self.image_dir = image_dir
+
+    def __len__(self):
+        return len(self.image_paths)
+
+    def __getitem__(self, idx):
+        # Load image
+        img_path = os.path.join(self.image_dir, self.image_paths[idx])
+        image = Image.open(img_path).convert('RGB')
+
+        # Load mask from JSON label
+        label_path = os.path.join(self.label_dir, os.path.splitext(self.image_paths[idx])[0] + '.json')
+        with open(label_path, 'r') as f:
+            label_data = json.load(f)
+        mask = self.generate_mask(label_data, image.size)
+
+        # Apply transforms
+        image_tensor = image_transform(image)
+        mask_tensor = mask_transform(Image.fromarray(mask))
+
+        # Tokenize question with PhoBERT
+        question = self.questions[idx]
+        inputs = tokenizer(question, return_tensors="pt", padding='max_length',
+                         max_length=MODEL_CONFIG.max_len, truncation=True)
+
+        # Convert answer to tensor
+        answer = torch.tensor(self.answers[idx])
+
+        return {
+            'image': image_tensor,
+            'mask': mask_tensor,
+            'input_ids': inputs['input_ids'].squeeze(0),
+            'attention_mask': inputs['attention_mask'].squeeze(0),
+            'answer': answer
+        }
+
+    def generate_mask(self, label_data, img_size):
+        """Generate binary mask from JSON annotations"""
+        mask = np.zeros((img_size[1], img_size[0]), dtype=np.uint8)
+
+        for shape in label_data['shapes']:
+            points = np.array(shape['points'], dtype=np.int32)
+
+            if shape['shape_type'] == 'rectangle':
+                cv2.rectangle(mask, tuple(points[0]), tuple(points[1]), 1, -1)
+            elif shape['shape_type'] == 'polygon':
+                cv2.fillPoly(mask, [points], 1)
+
+        return mask
+
+def ques_standard(text):
+    """Standardize Vietnamese questions"""
+    temp = text.strip('?').split(' ')
+    temp_list = []
+    for i in range(len(temp)):
+        if temp[i] != '':
+            temp[i] = re.sub("[\s+\.\!\/_,$%^*(+\"\')]+|[+——()?【】“”！，。？、~@#￥%……&*（）]+ ", "", temp[i].lower())
+            temp_list.append(temp[i].replace('-',' '))
+    return ' '.join(temp_list)
+
+def extract_data(file, start, end):
+    """Load data from | separated file"""
+    imag, ques, answ = [], [], []
+    with open(file, 'r', encoding='utf-8') as f:
+        lines = f.readlines()[start:end]
+        for line in lines:
+            parts = line.strip().split('|')
+            imag.append(parts[0])
+            ques.append(ques_standard(parts[-2]))
+            answ.append(parts[-1])
+    return imag, ques, answ
+
+def clsf_data(start1, start2, end1, end2, mode='class'):
+    """Classify data into yes/no and general answers"""
+    _imag1, _ques1, _answ1 = extract_data(train_text_file, start1, end1)
+    _imag2, _ques2, _answ2 = extract_data(valid_text_file, start2, end2)
+    _imag, _ques, _answ = _imag1+_imag2, _ques1+_ques2, _answ1+_answ2
+
+    yn_imag, yn_ques, yn_answ = [], [], []
+    ge_imag, ge_ques, ge_answ = [], [], []
+
+    for i in range(len(_answ)):
+        if _answ[i].lower() in ['có', 'không', 'yes', 'no']:
+            yn_imag.append(_imag[i])
+            yn_ques.append(_ques[i])
+            yn_answ.append(_answ[i])
         else:
-            imag_name, tokens, segment_ids, input_mask, masked_tokens, masked_pos, masked_weights = zip(*batch)
-            logits_lm = self.model(imag_name, tokens, segment_ids, input_mask, masked_pos)
-            masked_tokens = torch.cuda.LongTensor(masked_tokens)
-            masked_weights = torch.cuda.LongTensor(masked_weights)
-            loss_lm = nn.CrossEntropyLoss(reduction='none')(logits_lm.transpose(1, 2), masked_tokens)
-            return (loss_lm * masked_weights.float()).mean()
+            ge_imag.append(_imag[i])
+            ge_ques.append(_ques[i])
+            ge_answ.append(_answ[i])
 
-    def train_epoch(self, iterator, epoch, mode='class'):
-        self.model.train()
-        epoch_loss, count = 0, 0
-        iter_bar = tqdm(iterator, desc=f'Training Epoch {epoch}')
+    # Create answer dictionaries
+    yn_list = sorted(list(set(yn_answ)))
+    yn_dict = {yn_list[i]: i for i in range(len(yn_list))}
+    yn_answ = [yn_dict[ans] for ans in yn_answ]
 
-        for batch in iter_bar:
-            count += 1
-            self.optimizer.zero_grad()
+    ge_list = sorted(list(set(ge_answ)))
+    ge_dict = {ge_list[i]: i for i in range(len(ge_list))}
+    ge_answ = [ge_dict[ans] for ans in ge_answ]
 
-            loss = self.get_loss(batch, mode)
-            loss = loss.mean()
-            loss.backward()
+    if mode == 'yn':
+        return yn_imag, yn_ques, yn_answ, yn_dict
+    else:
+        return ge_imag, ge_ques, ge_answ, ge_dict
 
-            if self.config.clip:
-                nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
+def data_loader(imag, ques, answ, batch_size, image_dir, label_dir):
+    """Create DataLoader with image and mask support"""
+    dataset = MedicalDataset(imag, ques, answ, label_dir, image_dir)
+    return DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
-            self.optimizer.step()
-            iter_bar.set_description(f'Iter (loss={loss.item():5.3f})')
-            epoch_loss += loss.item()
+def train_model(model, imag_t, ques_t, answ_t, imag_v, ques_v, answ_v,
+               image_dir, label_dir, log_name, threshold, yn_mode, dict_op):
+    """Train model with image + mask"""
+    train_loader = data_loader(imag_t, ques_t, answ_t, batch_size, image_dir, label_dir)
+    valid_loader = data_loader(imag_v, ques_v, answ_v, batch_size, image_dir, label_dir)
 
-        return epoch_loss / count
+    optimizer = optim.Adam(model.parameters(), lr=MODEL_CONFIG.lr)
+    criterion = nn.CrossEntropyLoss()
+    scheduler = ReduceLROnPlateau(optimizer, mode='min', patience=3)
 
-    def evaluate(self, iterator, epoch, mode='class'):
-        self.model.eval()
-        epoch_loss, count = 0, 0
-
-        with torch.no_grad():
-            iter_bar = tqdm(iterator, desc=f'Validation Epoch {epoch}')
-            for batch in iter_bar:
-                count += 1
-                loss = self.get_loss(batch, mode)
-                loss = loss.mean()
-                iter_bar.set_description(f'Iter (loss={loss.item():5.3f})')
-                epoch_loss += loss.item()
-
-        return epoch_loss / count
-
-# Training pipeline
-def train_pipeline(model, train_data, valid_data, log_name, mode='class', dict_op=None,
-                   start_idx=0, end_idx=2, yn_mode=False, config=Config()):
-    """
-    Main training pipeline for classification or generation models
-
-    Args:
-        model: The model to train
-        train_data: Tuple of (images, questions, answers) for training
-        valid_data: Tuple of (images, questions, answers) for validation
-        log_name: Name for saving logs and models
-        mode: 'class' for classification or 'gene' for generation
-        dict_op: Dictionary for mapping output indices to answers
-        start_idx: Start index for test samples
-        end_idx: End index for test samples
-        yn_mode: Whether it's a yes/no question model
-        config: Configuration object
-    """
-    imag_t, ques_t, answ_t = train_data
-    imag_v, ques_v, answ_v = valid_data
-
-    # Initialize components
-    optimizer = optim.Adam(model.parameters(), lr=config.lr)
-    scheduler = ReduceLROnPlateau(optimizer, factor=0.1, patience=3, verbose=True)
-    trainer = Trainer(model, optimizer, scheduler, config)
-
-    # Prepare log file
-    log_file = os.path.join(config.save_dir, f"{log_name}.txt")
-    with open(log_file, 'w') as log_f:
-        log_f.write('epoch,train_loss,valid_loss\n')
-
-    # Training loop
     best_loss = float('inf')
-    stop_counter = 0
-    loss_history = []
-    result_dict = {}
+    for epoch in range(MODEL_CONFIG.epochs):
+        # Training
+        model.train()
+        train_loss = 0
+        for batch in tqdm(train_loader, desc=f'Epoch {epoch+1}'):
+            optimizer.zero_grad()
 
-    for epoch in range(config.epochs):
-        print(f'\nEpoch: {epoch + 1}')
+            outputs = model(
+                image=batch['image'].to(MODEL_CONFIG.device),
+                mask=batch['mask'].to(MODEL_CONFIG.device),
+                input_ids=batch['input_ids'].to(MODEL_CONFIG.device),
+                attention_mask=batch['attention_mask'].to(MODEL_CONFIG.device)
+            )
 
-        # Create data loaders
-        if mode == 'class':
-            train_iterator = data_loader(imag_t, ques_t, answ_t, config.batch_size, config.max_len)
-            valid_iterator = data_loader(imag_v, ques_v, answ_v, config.batch_size, config.max_len)
-        else:
-            train_iterator = gene_loader(imag_t, ques_t, answ_t, config.batch_size, config.gen_len)
-            valid_iterator = gene_loader(imag_v, ques_v, answ_v, config.batch_size, config.gen_len)
+            loss = criterion(outputs, batch['answer'].to(MODEL_CONFIG.device))
+            loss.backward()
+            optimizer.step()
+            train_loss += loss.item()
 
-        # Train and validate
-        train_loss = trainer.train_epoch(train_iterator, epoch + 1, mode)
-        valid_loss = trainer.evaluate(valid_iterator, epoch + 1, mode)
-        scheduler.step(valid_loss)
+        # Validation
+        model.eval()
+        valid_loss = 0
+        with torch.no_grad():
+            for batch in valid_loader:
+                outputs = model(
+                    image=batch['image'].to(MODEL_CONFIG.device),
+                    mask=batch['mask'].to(MODEL_CONFIG.device),
+                    input_ids=batch['input_ids'].to(MODEL_CONFIG.device),
+                    attention_mask=batch['attention_mask'].to(MODEL_CONFIG.device)
+                )
+                valid_loss += criterion(outputs, batch['answer'].to(MODEL_CONFIG.device)).item()
 
-        # Log results
-        with open(log_file, 'a') as log_f:
-            log_f.write(f'{epoch + 1},{train_loss:.5f},{valid_loss:.5f}\n')
+        avg_valid_loss = valid_loss / len(valid_loader)
+        scheduler.step(avg_valid_loss)
 
-        # Check for best model
-        if valid_loss < best_loss and valid_loss < config.threshold:
-            best_loss = valid_loss
-            stop_counter = 0
-            loss_history.append(valid_loss)
+        # Save best model
+        if avg_valid_loss < best_loss and avg_valid_loss < threshold:
+            best_loss = avg_valid_loss
+            torch.save(model.state_dict(), os.path.join(save_dir, f'{log_name}_best.pt'))
 
-            # Save model and get predictions
-            if mode == 'class':
-                # Classification task
-                gt_temp, answ_temp = [], []
-
-                for i in range(start_idx, end_idx):
-                    ques_name, imag_name, tokens, segment_ids, input_mask = test_data(
-                        test_imag, test_ques, i)
-
-                    if yn_mode:
-                        if test_ques[i] in mod_yn_ques + abn_yn_ques:
-                            result_dict[str(i)] = get_answer(
-                                model, dict_op, imag_name, tokens, segment_ids, input_mask)
-                            gt_temp.append(test_answ[i])
-                            answ_temp.append(result_dict[str(i)])
-                    else:
-                        if test_ques[i] not in mod_yn_ques + abn_yn_ques:
-                            result_dict[str(i)] = get_answer(
-                                model, dict_op, imag_name, tokens, segment_ids, input_mask)
-                            gt_temp.append(test_answ[i])
-                            answ_temp.append(result_dict[str(i)])
-
-                # Calculate accuracy
-                if gt_temp:
-                    accuracy = sum(1 for i in range(len(gt_temp)) if gt_temp[i] == answ_temp[i]) / len(gt_temp)
-                    model_path = os.path.join(
-                        config.save_dir,
-                        f"{log_name}_{accuracy:.3f}_{valid_loss:.3f}.pt"
-                    )
-                    torch.save(model.state_dict(), model_path)
-            else:
-                # Generation task
-                for i in range(start_idx, end_idx):
-                    imag_name = test_imag[i]
-                    part1 = [0 for _ in range(5)]
-                    part2 = token_id(tokenize(test_ques[i]))
-                    tokens = token_id(['[CLS]']) + part1 + token_id(['[SEP]']) + part2 + token_id(['[SEP]']) + token_id(['[MASK]'])
-                    masked_pos = [len(part1 + part2) + 3]
-                    segment_ids = [0] * (len(part1) + 2) + [1] * (len(part2) + 1) + [2] * 1
-                    input_mask = [1] * (len(part1 + part2) + 4)
-
-                    n_pad = config.gen_len - len(part1 + part2) - 4
-                    tokens.extend([0] * n_pad)
-                    segment_ids.extend([0] * n_pad)
-                    input_mask.extend([0] * n_pad)
-
-                    output = []
-                    for k in range(n_pad):
-                        with torch.no_grad():
-                            pred = model([imag_name], [tokens], [segment_ids], [input_mask], [masked_pos])
-                            out = int(np.argsort((pred.cpu())[0][0])[-1])
-                            output.append(abn_dict_op[out])
-
-                            if out == 102:  # [SEP] token
-                                break
-                            else:
-                                tokens[len(part1 + part2) + 3 + k] = out
-                                tokens[len(part1 + part2) + 4 + k] = token_id(['[MASK]'])[0]
-                                masked_pos = [len(part1 + part2) + 4 + k]
-                                segment_ids = [0] * (len(part1) + 2) + [1] * (len(part2) + 1) + [2] * (2 + k)
-                                input_mask = [1] * (len(part1 + part2) + 5 + k)
-                                n_pad = n_pad - 1
-                                segment_ids.extend([0] * n_pad)
-                                input_mask.extend([0] * n_pad)
-
-                    result_dict[str(i)] = (' '.join(output)).replace(' ##', '').replace(' [SEP]', '').replace(', ', '')
-
-                model_path = os.path.join(config.save_dir, f"{log_name}_{valid_loss:.3f}.pt")
-                torch.save(model.state_dict(), model_path)
-        else:
-            stop_counter += 1
-            if stop_counter > 10:
-                print("Early stopping triggered")
-                break
-
-    return result_dict, min(loss_history) if loss_history else float('inf')
-
-# Utility functions
-def get_answer(model, dict_op, imag_name, tokens, segment_ids, input_mask):
-    model.eval()
-    with torch.no_grad():
-        pred = model([imag_name], [tokens], [segment_ids], [input_mask])
-    return dict_op[int(np.argsort(pred.cpu())[:, -1:][0][0])]
-
-def test_data(test_imag, test_ques, i, max_len):
-    imag_name = test_imag[i]
-    part1 = [0 for _ in range(5)]
-    part2 = token_id(tokenize(test_ques[i]))
-    tokens = token_id(['[CLS]']) + part1 + token_id(['[SEP]']) + part2[:max_len - 8] + token_id(['[SEP]'])
-    segment_ids = [0] * (len(part1) + 2) + [1] * (len(part2[:max_len - 8]) + 1)
-    input_mask = [1] * len(tokens)
-
-    n_pad = max_len - len(tokens)
-    tokens.extend([0] * n_pad)
-    segment_ids.extend([0] * n_pad)
-    input_mask.extend([0] * n_pad)
-
-    return (test_ques[i], imag_name, tokens, segment_ids, input_mask)
+    return best_loss
 
 # Main execution
 if __name__ == "__main__":
+    # Configuration
+    train_text_file = "path/to/train.txt"
+    valid_text_file = "path/to/valid.txt"
+    test_text_file = "path/to/test.txt"
+    label_dir = "path/to/labels/"
+    image_dir = "path/to/images/"
+    save_dir = "path/to/save/"
+    os.makedirs(save_dir, exist_ok=True)
 
-    config = Config()
+    # Load and prepare data
+    mod_imag, mod_ques, mod_answ, mod_dict = clsf_data(0, 0, 2, 2)
+    mod_yn_imag, mod_yn_ques, mod_yn_answ, mod_yn_dict = clsf_data(0, 0, 2, 2, mode='yn')
+
+    # Train models
+    mod_loss = train_model(
+        mod_model1().to(MODEL_CONFIG.device),
+        mod_imag, mod_ques, mod_answ,
+        mod_imag, mod_ques, mod_answ,
+        image_dir, label_dir,
+        'mod_model', 2.0, False, mod_dict
+    )
+
+    mod_yn_loss = train_model(
+        mod_yn_model1().to(MODEL_CONFIG.device),
+        mod_yn_imag, mod_yn_ques, mod_yn_answ,
+        mod_yn_imag, mod_yn_ques, mod_yn_answ,
+        image_dir, label_dir,
+        'mod_yn_model', 2.0, True, mod_yn_dict
+    )
