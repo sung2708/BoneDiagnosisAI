@@ -6,34 +6,28 @@ from ..configs import MODEL_CONFIG
 class EfficientImageEncoder(nn.Module):
     def __init__(self):
         super().__init__()
-        # Sử dụng ResNet làm backbone
+        # Backbone ResNet50
         self.cnn = models.resnet50(pretrained=True)
 
-        # Đóng băng các layer đầu
-        for param in list(self.cnn.parameters())[:-4]:
-            param.requires_grad = False
+        # Đóng băng có chọn lọc
+        for name, param in self.cnn.named_parameters():
+            if 'layer4' not in name and 'fc' not in name:  # Chỉ fine-tune layer4 và fc
+                param.requires_grad = False
 
-        # Layer cuối cùng để extract features
+        # Feature extractor tối ưu
         self.feature_extractor = nn.Sequential(
-            *list(self.cnn.children())[:-1],
-            nn.Conv2d(2048, MODEL_CONFIG.dim, kernel_size=1)
+            *list(self.cnn.children())[:-2],  # Giữ lại đến layer4
+            nn.AdaptiveAvgPool2d((1, 1)),
+            nn.Flatten(),
+            nn.Linear(2048, MODEL_CONFIG.dim)
         )
 
-        # Layer xử lý mask
-        self.mask_processor = nn.Sequential(
-            nn.Conv2d(1, 64, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(2),
-            nn.Conv2d(64, MODEL_CONFIG.dim, kernel_size=1)
-        )
+        # Layer chuẩn hóa
+        self.norm = nn.LayerNorm(MODEL_CONFIG.dim)
 
     def forward(self, image, mask):
-        # Extract features từ ảnh
+        # Image features
         img_features = self.feature_extractor(image)
 
-        # Xử lý mask
-        mask_features = self.mask_processor(mask.unsqueeze(1))
-
-        # Kết hợp features
-        combined = img_features * mask_features
-        return combined.flatten(2).transpose(1, 2)
+        combined = self.norm(img_features)
+        return combined.unsqueeze(1)  # [B, 1, dim]

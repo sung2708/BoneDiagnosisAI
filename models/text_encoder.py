@@ -6,11 +6,19 @@ from ..configs import MODEL_CONFIG
 class PhoBERTTextEncoder(nn.Module):
     def __init__(self):
         super().__init__()
-        self.phobert = AutoModel.from_pretrained("vinai/phobert-base")
+        self.phobert = AutoModel.from_pretrained("vinai/phobert-base-v2")
 
-        # Projection layer để phù hợp với dimension của model
-        self.proj = nn.Linear(768, MODEL_CONFIG.dim) if 768 != MODEL_CONFIG.dim else nn.Identity()
+        # Projection layer với khởi tạo tốt hơn
+        self.proj = nn.Sequential(
+            nn.Linear(768, MODEL_CONFIG.dim),
+            nn.LayerNorm(MODEL_CONFIG.dim),
+            nn.GELU()
+        )
 
     def forward(self, input_ids, attention_mask):
-        outputs = self.phobert(input_ids=input_ids, attention_mask=attention_mask)
-        return self.proj(outputs.last_hidden_state)
+        outputs = self.phobert(
+            input_ids=input_ids,
+            attention_mask=attention_mask
+        )
+        # Lấy [CLS] token
+        return self.proj(outputs.last_hidden_state[:, 0]).unsqueeze(1)  # [B, 1, dim]

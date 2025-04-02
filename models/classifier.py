@@ -15,24 +15,38 @@ class DiseaseClassifier(nn.Module):
         self.fusion = MultiHeadedAttention()
 
         # Các lớp phân loại
-        self.disease_head = nn.Linear(MODEL_CONFIG.dim, 3)  # 3 loại bệnh
-        self.confidence_head = nn.Linear(MODEL_CONFIG.dim, 1)  # Dự đoán confidence
+        self.disease_head = nn.Sequential(
+            nn.Linear(MODEL_CONFIG.dim, MODEL_CONFIG.dim//2),
+            nn.ReLU(),
+            nn.Linear(MODEL_CONFIG.dim//2, 3)  # 3 loại bệnh
+        )
 
-        # Dropout
+        self.confidence_head = nn.Sequential(
+            nn.Linear(MODEL_CONFIG.dim, 1),
+            nn.Sigmoid()
+        )
+
+        # Regularization
         self.dropout = nn.Dropout(MODEL_CONFIG.drop)
+        self.layer_norm = nn.LayerNorm(MODEL_CONFIG.dim)
 
     def forward(self, image, input_ids, attention_mask):
-        # Mã hóa các đầu vào (bỏ mask nếu không dùng)
+        # Mã hóa các đầu vào
         img_features = self.image_encoder(image)
         text_features = self.text_encoder(input_ids, attention_mask)
 
-        # Kết hợp thông tin
+        # Chuẩn hóa và kết hợp thông tin
+        img_features = self.layer_norm(img_features)
+        text_features = self.layer_norm(text_features)
         combined = torch.cat([img_features, text_features], dim=1)
+
+        # Fusion với attention
         fused = self.fusion(combined)
+        fused = self.dropout(fused)
 
         # Dự đoán
-        disease_logits = self.disease_head(self.dropout(fused[:, 0]))  # [CLS] token
-        confidence = torch.sigmoid(self.confidence_head(self.dropout(fused[:, 1])))  # Confidence 0-1
+        disease_logits = self.disease_head(fused[:, 0])
+        confidence = self.confidence_head(fused[:, 1])
 
         return {
             'disease': disease_logits,

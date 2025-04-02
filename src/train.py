@@ -5,11 +5,10 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, get_linear_schedule_with_warmup
 from tqdm import tqdm
 from PIL import Image
 import numpy as np
-import random
 from models.classifier import DiseaseClassifier
 from configs import MODEL_CONFIG, DATA_PATHS
 
@@ -83,53 +82,66 @@ def train():
         train_dataset,
         batch_size=config.batch_size,
         shuffle=True,
-        num_workers=4
+        num_workers=4,
+        pin_memory=True if torch.cuda.is_available() else False
     )
 
     # Model
     model = DiseaseClassifier().to(config.device)
 
-    # Loss với trọng số confidence
-    def weighted_loss(logits, labels, confidence):
-        base_loss = nn.CrossEntropyLoss(reduction='none')(logits, labels)
-        return (base_loss * confidence).mean()
+    # Optimizer và scheduler
+    optimizer = optim.AdamW(
+        model.parameters(),
+        lr=config.lr,
+        weight_decay=0.01
+    )
+    scheduler = get_linear_schedule_with_warmup(
+        optimizer,
+        num_warmup_steps=len(train_loader)//3,
+        num_training_steps=len(train_loader)*config.epochs
+    )
 
-    optimizer = optim.Adam(model.parameters(), lr=config.lr)
+    # Loss function với trọng số confidence
+    def weighted_loss(logits, labels, confidence):
+        ce_loss = nn.CrossEntropyLoss(reduction='none')(logits, labels)
+        return (ce_loss * confidence).mean()
 
     # Training loop
+    best_loss = float('inf')
     for epoch in range(config.epochs):
         model.train()
-        total_loss = 0.0
+        epoch_loss = 0.0
 
         for batch in tqdm(train_loader, desc=f"Epoch {epoch+1}/{config.epochs}"):
             # Chuyển dữ liệu sang device
-            images = batch['image'].to(config.device)
-            input_ids = batch['input_ids'].to(config.device)
-            attention_mask = batch['attention_mask'].to(config.device)
-            labels = batch['disease_label'].to(config.device)
-            confidence = batch['confidence'].to(config.device)
+            images = batch['image'].to(config.device, non_blocking=True)
+            input_ids = batch['input_ids'].to(config.device, non_blocking=True)
+            attention_mask = batch['attention_mask'].to(config.device, non_blocking=True)
+            labels = batch['disease_label'].to(config.device, non_blocking=True)
+            confidence = batch['confidence'].to(config.device, non_blocking=True)
 
             # Forward
-            optimizer.zero_grad()
             outputs = model(images, input_ids, attention_mask)
 
-            # Tính loss có trọng số
+            # Loss
             loss = weighted_loss(outputs['disease'], labels, confidence)
 
-            # Backprop
+            # Backward
             loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
             optimizer.step()
+            scheduler.step()
+            optimizer.zero_grad()
 
-            total_loss += loss.item()
+            epoch_loss += loss.item()
 
-        # Log và lưu model
-        avg_loss = total_loss / len(train_loader)
-        print(f"Epoch {epoch+1}, Loss: {avg_loss:.4f}")
+        # Đánh giá và lưu model
+        avg_loss = epoch_loss / len(train_loader)
+        if avg_loss < best_loss:
+            best_loss = avg_loss
+            torch.save(model.state_dict(), os.path.join(config.save_dir, "best_model.pt"))
 
-        torch.save(
-            model.state_dict(),
-            os.path.join(config.save_dir, f"model_epoch_{epoch+1}.pt")
-        )
+        print(f"Epoch {epoch+1}: Loss = {avg_loss:.4f} | Best Loss = {best_loss:.4f}")
 
 if __name__ == "__main__":
     train()
