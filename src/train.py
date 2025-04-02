@@ -10,7 +10,7 @@ from tqdm import tqdm
 from PIL import Image
 import numpy as np
 from models.classifier import DiseaseClassifier
-from configs import MODEL_CONFIG, DATA_PATHS
+from configs.config import MODEL_CONFIG, DATA_PATHS
 
 # Tokenizer
 tokenizer = AutoTokenizer.from_pretrained("vinai/phobert-base-v2")

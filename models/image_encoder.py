@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torchvision.models as models
-from ..configs import MODEL_CONFIG
+from configs.config import MODEL_CONFIG
 
 class EfficientImageEncoder(nn.Module):
     def __init__(self):

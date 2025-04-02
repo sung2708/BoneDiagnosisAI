@@ -3,7 +3,7 @@ import torch
 from .image_encoder import EfficientImageEncoder
 from .text_encoder import PhoBERTTextEncoder
 from .fusion import MultiHeadedAttention
-from ..configs import MODEL_CONFIG
+from configs.config import MODEL_CONFIG
 
 class DiseaseClassifier(nn.Module):
     """Model tổng hợp cho 3 loại bệnh chính với hỗ trợ confidence score"""

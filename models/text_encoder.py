@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from transformers import AutoModel
-from ..configs import MODEL_CONFIG
+from configs.config import MODEL_CONFIG
 
 class PhoBERTTextEncoder(nn.Module):
     def __init__(self):

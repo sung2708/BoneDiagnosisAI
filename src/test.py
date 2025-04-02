@@ -7,7 +7,7 @@ from torchvision import transforms
 import json
 import numpy as np
 from models.classifier import DiseaseClassifier
-from configs import MODEL_CONFIG
+from configs.config import MODEL_CONFIG
 
 # Load model và tokenizer
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
