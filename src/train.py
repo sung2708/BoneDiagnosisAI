@@ -9,7 +9,7 @@ from transformers import AutoTokenizer, get_linear_schedule_with_warmup
 from tqdm import tqdm
 from PIL import Image
 import numpy as np
-from sklearn.metrics import classification_report
+from sklearn.metrics import accuracy_score, f1_score
 from models.classifier import DiseaseClassifier
 from configs.config import MODEL_CONFIG, DATA_PATHS
 
@@ -24,18 +24,18 @@ image_transform = transforms.Compose([
 ])
 
 class MedicalVQADataset(Dataset):
-    """Dataset cho VQA y tế với multi-question và confidence"""
-    # Chuyển disease_map thành class attribute
-    disease_map = {
-        'u_xuong': 0,
-        'viem_nhiem': 1,
-        'chan_thuong': 2
-    }
-
+    """Dataset cho bài toán classification bệnh"""
     def __init__(self, label_path, image_dir):
         self.image_dir = image_dir
         with open(label_path) as f:
             self.data = json.load(f)
+
+        # Ánh xạ nhãn bệnh
+        self.disease_map = {
+            'u_xuong': 0,
+            'viem_nhiem': 1,
+            'chan_thuong': 2
+        }
 
     def __len__(self):
         return len(self.data)
@@ -67,24 +67,30 @@ class MedicalVQADataset(Dataset):
             'disease_label': disease_label,
             'confidence': confidence,
             'question_id': item['question_id'],
-            'question': item['question'],
-            'image_path': item['image_path']
+            'answer': item['answer']  # Thêm answer để tính bleu score
         }
-
-    @classmethod
-    def get_inverse_mapping(cls):
-        """Phương thức class để lấy ánh xạ ngược"""
-        return {v: k for k, v in cls.disease_map.items()}
 
 def weighted_loss(logits, labels, confidence):
     ce_loss = nn.CrossEntropyLoss(reduction='none')(logits, labels)
     return (ce_loss * confidence).mean()
 
+def compute_bleu_score(predictions, references):
+    # Đơn giản hóa tính bleu score, có thể thay thế bằng implementation chi tiết hơn nếu cần
+    from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
+    smoothie = SmoothingFunction().method4
+    scores = []
+    for pred, ref in zip(predictions, references):
+        pred_tokens = pred.split()
+        ref_tokens = ref.split()
+        scores.append(sentence_bleu([ref_tokens], pred_tokens, smoothing_function=smoothie))
+    return np.mean(scores)
+
 def evaluate_model(model, dataloader, device, disease_map_inv):
     model.eval()
     all_preds = []
     all_labels = []
-    eval_results = []
+    all_answers = []
+    all_pred_answers = []
 
     with torch.no_grad():
         for batch in dataloader:
@@ -98,21 +104,23 @@ def evaluate_model(model, dataloader, device, disease_map_inv):
 
             all_preds.extend(preds.cpu().numpy())
             all_labels.extend(labels.cpu().numpy())
-
-            # Lưu kết quả cho evaluation chi tiết
-            for i in range(len(batch['question_id'])):
-                eval_results.append({
-                    'question_id': batch['question_id'][i],
-                    'image_id': os.path.basename(batch['image_path'][i]),
-                    'pred_label': disease_map_inv[preds[i].item()],
-                    'true_label': disease_map_inv[labels[i].item()],
-                    'question': batch['question'][i]
-                })
+            all_answers.extend(batch['answer'])
+            # Giả sử model có thể trả về answer dự đoán, nếu không thì sử dụng answer mặc định
+            all_pred_answers.extend([disease_map_inv[pred.item()] for pred in preds])  # Đơn giản hóa
 
     # Tính các metrics
-    report = classification_report(all_labels, all_preds, target_names=list(disease_map_inv.values()))
-    return report, eval_results
+    accuracy = accuracy_score(all_labels, all_preds)
+    f1 = f1_score(all_labels, all_preds, average='weighted')
+    bleu = compute_bleu_score(all_pred_answers, all_answers)
 
+    results = {
+        'accuracy': accuracy,
+        'f1': f1,
+        'bleu': bleu,
+        'predictions': list(zip(all_preds, all_labels, all_answers, all_pred_answers))
+    }
+
+    return results
 
 def train():
     # Cấu hình
@@ -120,16 +128,16 @@ def train():
     os.makedirs(DATA_PATHS['save_dir'], exist_ok=True)
     os.makedirs(DATA_PATHS['eval_dir'], exist_ok=True)
 
-    # Tạo ánh xạ ngược từ index sang tên bệnh
-    disease_map_inv = MedicalVQADataset.get_inverse_mapping()  # Sử dụng phương thức class
-
-    # Dataset từ file JSON label
+    # Tạo dataset trước
     full_dataset = MedicalVQADataset(
         label_path=DATA_PATHS['label_path'],
         image_dir=DATA_PATHS['image_dir']
     )
 
-    # Chia dataset thành train/val/test
+    # Sau đó mới tạo ánh xạ ngược từ index sang tên bệnh
+    disease_map_inv = {v: k for k, v in full_dataset.disease_map.items()}
+
+    # Phần còn lại của hàm train() giữ nguyên...
     train_size = int(config['train_ratio'] * len(full_dataset))
     val_size = int(config['val_ratio'] * len(full_dataset))
     test_size = len(full_dataset) - train_size - val_size
@@ -181,7 +189,7 @@ def train():
     )
 
     # Training loop
-    best_val_loss = float('inf')
+    best_val_f1 = 0.0
     for epoch in range(config['epochs']):
         model.train()
         epoch_loss = 0.0
@@ -208,34 +216,37 @@ def train():
             epoch_loss += loss.item()
 
         # Validation phase
-        val_report, _ = evaluate_model(model, val_loader, config['device'], disease_map_inv)
+        val_results = evaluate_model(model, val_loader, config['device'], disease_map_inv)
         avg_train_loss = epoch_loss / len(train_loader)
 
         print(f"\nEpoch {epoch+1}/{config['epochs']}:")
         print(f"Train Loss: {avg_train_loss:.4f}")
-        print("\nValidation Report:")
-        print(val_report)
+        print(f"Val Accuracy: {val_results['accuracy']:.4f}")
+        print(f"Val F1 Score: {val_results['f1']:.4f}")
+        print(f"Val BLEU Score: {val_results['bleu']:.4f}")
 
-        # Lưu model tốt nhất
-        if avg_train_loss < best_val_loss:
-            best_val_loss = avg_train_loss
+        # Lưu model tốt nhất dựa trên F1 score
+        if val_results['f1'] > best_val_f1:
+            best_val_f1 = val_results['f1']
             torch.save(model.state_dict(), os.path.join(DATA_PATHS['save_dir'], "best_model.pt"))
-            print("Saved best model based on validation loss!")
+            print("Saved best model based on validation F1 score!")
 
     # Đánh giá trên test set
     print("\nEvaluating on test set...")
-    test_report, test_results = evaluate_model(model, test_loader, config['device'], disease_map_inv)
-    print("\nTest Report:")
-    print(test_report)
+    test_results = evaluate_model(model, test_loader, config['device'], disease_map_inv)
+
+    print("\nTest Results:")
+    print(f"Accuracy: {test_results['accuracy']:.4f}")
+    print(f"F1 Score: {test_results['f1']:.4f}")
+    print(f"BLEU Score: {test_results['bleu']:.4f}")
 
     # Lưu kết quả evaluation
-    with open(os.path.join(DATA_PATHS['eval_dir'], 'test_report.txt'), 'w') as f:
-        f.write(test_report)
-
-    # Lưu kết quả chi tiết để sử dụng với VqaMedEvaluator
-    with open(os.path.join(DATA_PATHS['eval_dir'], 'test_predictions.tsv'), 'w') as f:
-        for result in test_results:
-            f.write(f"{result['question_id']}\t{result['image_id']}\t{result['pred_label']}\n")
+    with open(os.path.join(DATA_PATHS['eval_dir'], 'test_results.json'), 'w') as f:
+        json.dump({
+            'accuracy': test_results['accuracy'],
+            'f1': test_results['f1'],
+            'bleu': test_results['bleu']
+        }, f, indent=4)
 
 if __name__ == "__main__":
     train()
