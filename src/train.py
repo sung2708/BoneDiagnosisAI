@@ -70,7 +70,8 @@ class MedicalVQADataset(Dataset):
 def train():
     # Cấu hình
     config = MODEL_CONFIG
-    os.makedirs(config.save_dir, exist_ok=True)
+    path = DATA_PATHS
+    os.makedirs(path['save_dir'], exist_ok=True)
 
     # Dataset từ file JSON label
     train_dataset = MedicalVQADataset(
@@ -80,25 +81,25 @@ def train():
 
     train_loader = DataLoader(
         train_dataset,
-        batch_size=config.batch_size,
+        batch_size=config['batch_size'],
         shuffle=True,
         num_workers=4,
-        pin_memory=True if torch.cuda.is_available() else False
+        pin_memory=True
     )
 
     # Model
-    model = DiseaseClassifier().to(config.device)
+    model = DiseaseClassifier().to(config['device'])
 
     # Optimizer và scheduler
     optimizer = optim.AdamW(
         model.parameters(),
-        lr=config.lr,
+        lr=config['lr'],
         weight_decay=0.01
     )
     scheduler = get_linear_schedule_with_warmup(
         optimizer,
         num_warmup_steps=len(train_loader)//3,
-        num_training_steps=len(train_loader)*config.epochs
+        num_training_steps=len(train_loader)*config['epochs']
     )
 
     # Loss function với trọng số confidence
@@ -108,17 +109,17 @@ def train():
 
     # Training loop
     best_loss = float('inf')
-    for epoch in range(config.epochs):
+    for epoch in range(config['epochs']):
         model.train()
         epoch_loss = 0.0
 
-        for batch in tqdm(train_loader, desc=f"Epoch {epoch+1}/{config.epochs}"):
+        for batch in tqdm(train_loader, desc=f"Epoch {epoch+1}/{config['epochs']}"):
             # Chuyển dữ liệu sang device
-            images = batch['image'].to(config.device, non_blocking=True)
-            input_ids = batch['input_ids'].to(config.device, non_blocking=True)
-            attention_mask = batch['attention_mask'].to(config.device, non_blocking=True)
-            labels = batch['disease_label'].to(config.device, non_blocking=True)
-            confidence = batch['confidence'].to(config.device, non_blocking=True)
+            images = batch['image'].to(config['device'], non_blocking=True)
+            input_ids = batch['input_ids'].to(config['device'], non_blocking=True)
+            attention_mask = batch['attention_mask'].to(config['device'], non_blocking=True)
+            labels = batch['disease_label'].to(config['device'], non_blocking=True)
+            confidence = batch['confidence'].to(config['device'], non_blocking=True)
 
             # Forward
             outputs = model(images, input_ids, attention_mask)

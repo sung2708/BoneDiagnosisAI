@@ -7,15 +7,15 @@ from configs.config import MODEL_CONFIG
 class MultiHeadedAttention(nn.Module):
     def __init__(self):
         super().__init__()
-        self.dim = MODEL_CONFIG.dim
-        self.heads = MODEL_CONFIG.heads
+        self.dim = MODEL_CONFIG['dim']
+        self.heads = MODEL_CONFIG['heads']
         self.head_dim = self.dim // self.heads
 
         assert self.head_dim * self.heads == self.dim, "dim must be divisible by heads"
 
         self.qkv = nn.Linear(self.dim, self.dim * 3)
         self.proj = nn.Linear(self.dim, self.dim)
-        self.dropout = nn.Dropout(MODEL_CONFIG.drop)
+        self.dropout = nn.Dropout(MODEL_CONFIG['drop'])
 
     def forward(self, x):
         B, N, _ = x.shape
@@ -33,10 +33,10 @@ class PositionWiseFeedForward(nn.Module):
     def __init__(self):
         super().__init__()
         self.net = nn.Sequential(
-            nn.Linear(MODEL_CONFIG.dim, MODEL_CONFIG.dim * 4),
+            nn.Linear(MODEL_CONFIG['dim'], MODEL_CONFIG['dim'] * 4),
             nn.GELU(),
             nn.Dropout(MODEL_CONFIG.drop),
-            nn.Linear(MODEL_CONFIG.dim * 4, MODEL_CONFIG.dim)
+            nn.Linear(MODEL_CONFIG['dim'] * 4, MODEL_CONFIG['dim'])
         )
 
     def forward(self, x):

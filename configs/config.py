@@ -1,11 +1,9 @@
 import torch
 
-device = "cuda:0" if torch.cuda.is_available() else "cpu"
-
 DATA_PATHS = {
-    'image_dir': '../data/images/',
-    'label_path': '../data/advanced_vqa_labels.json',
-    'save_dir': '../saved_models'
+    'image_dir': './data/images/',
+    'label_path': './data/advanced_vqa_labels.json',
+    'save_dir': './saved_models'
 }
 
 MODEL_CONFIG = {
@@ -20,5 +18,6 @@ MODEL_CONFIG = {
     "lr": 3e-5,           # Learning rate nhỏ hơn
     "clip": True,         # Gradient clipping
     "warmup_steps": 1000, # Warmup cho scheduler
-    "weight_decay": 0.01  # Regularization
+    "weight_decay": 0.01, # Regularization
+    "device": "cuda" if torch.cuda.is_available() else "cpu"
 }

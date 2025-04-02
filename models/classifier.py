@@ -16,19 +16,19 @@ class DiseaseClassifier(nn.Module):
 
         # Các lớp phân loại
         self.disease_head = nn.Sequential(
-            nn.Linear(MODEL_CONFIG.dim, MODEL_CONFIG.dim//2),
+            nn.Linear(MODEL_CONFIG['dim'], MODEL_CONFIG['dim']//2),
             nn.ReLU(),
-            nn.Linear(MODEL_CONFIG.dim//2, 3)  # 3 loại bệnh
+            nn.Linear(MODEL_CONFIG['dim']//2, 3)  # 3 loại bệnh
         )
 
         self.confidence_head = nn.Sequential(
-            nn.Linear(MODEL_CONFIG.dim, 1),
+            nn.Linear(MODEL_CONFIG['dim'], 1),
             nn.Sigmoid()
         )
 
         # Regularization
-        self.dropout = nn.Dropout(MODEL_CONFIG.drop)
-        self.layer_norm = nn.LayerNorm(MODEL_CONFIG.dim)
+        self.dropout = nn.Dropout(MODEL_CONFIG['drop'])
+        self.layer_norm = nn.LayerNorm(MODEL_CONFIG['dim'])
 
     def forward(self, image, input_ids, attention_mask):
         # Mã hóa các đầu vào
