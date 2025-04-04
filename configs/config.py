@@ -1,27 +1,38 @@
 import torch
 
-DATA_PATHS = {
-    'image_dir': 'data/images/',
-    'label_path': 'data/processed_labels.json',
-    'save_dir': 'saved_models',
-    'eval_dir': 'evaluation'
+MODEL_CONFIG = {
+    # Model architecture
+    "dim": 768,
+    "heads": 8,
+    "drop": 0.1,
+
+    # Input processing
+    "text_model": "vinai/phobert-base",
+    "max_len": 64,
+    "image_size": 224,
+    "image_mean": [0.485, 0.456, 0.406],
+    "image_std": [0.229, 0.224, 0.225],
+
+    # Classes (sẽ được tự động cập nhật từ tên thư mục)
+    "class_names": ["U_xuong", "Viem_nhiem", "Chan_thuong"],  # Cố định 3 lớp
+    "medical_keywords": [
+        "u xương", "viêm", "nhiễm trùng", "gãy", "chấn thương",
+        "tổn thương", "đau", "X-quang", "xương", "khớp"
+    ],
+
+    # Device
+    "device": "cuda" if torch.cuda.is_available() else "cpu"
 }
 
-MODEL_CONFIG = {
-    "vocab_size": 30522,          # PhoBERT vocab size
-    "max_len": 32,                # Max sequence length for questions
-    "dim": 768,                   # Embedding dimension
-    "heads": 8,                   # Number of attention heads
-    "n_layers": 6,                # Number of transformer layers
-    "drop": 0.1,                  # Dropout rate
-    "batch_size": 32,             # Batch size
-    "epochs": 50,                 # Number of epochs
-    "lr": 3e-5,                   # Learning rate
-    "clip": True,                 # Gradient clipping
-    "warmup_steps": 1000,         # Warmup steps for scheduler
-    "weight_decay": 0.01,         # Weight decay for regularization
-    "device": "cuda" if torch.cuda.is_available() else "cpu",
-    "train_ratio": 0.7,           # 70% for training
-    "val_ratio": 0.15,            # 15% for validation
-    "test_ratio": 0.15            # 15% for testing
+DATA_PATHS = {
+    "image_dir": "data",  # Thư mục gốc chứa các thư mục con theo lớp
+    "save_dir": "saved_models",
+    "eval_dir": "evaluation"
+}
+
+TRAINING_CONFIG = {
+    "batch_size": 32,
+    "epochs": 30,
+    "learning_rate": 3e-5,
+    "oversample_minority": True
 }
