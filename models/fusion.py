@@ -1,43 +1,43 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-import math
-from configs.config import MODEL_CONFIG
+from Configs.config import Config
 
-class MultiHeadedAttention(nn.Module):
+class Fusion(nn.Module):
     def __init__(self):
         super().__init__()
-        self.dim = MODEL_CONFIG['dim']
-        self.heads = MODEL_CONFIG['heads']
-        self.head_dim = self.dim // self.heads
-
-        assert self.head_dim * self.heads == self.dim, "dim must be divisible by heads"
-
-        self.qkv = nn.Linear(self.dim, self.dim * 3)
-        self.proj = nn.Linear(self.dim, self.dim)
-        self.dropout = nn.Dropout(MODEL_CONFIG['drop'])
-
-    def forward(self, x):
-        B, N, _ = x.shape
-        qkv = self.qkv(x).reshape(B, N, 3, self.heads, self.head_dim).permute(2, 0, 3, 1, 4)
-        q, k, v = qkv[0], qkv[1], qkv[2]
-
-        attn = (q @ k.transpose(-2, -1)) / math.sqrt(self.head_dim)
-        attn = F.softmax(attn, dim=-1)
-        attn = self.dropout(attn)
-
-        x = (attn @ v).transpose(1, 2).reshape(B, N, self.dim)
-        return self.proj(x)
-
-class PositionWiseFeedForward(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.net = nn.Sequential(
-            nn.Linear(MODEL_CONFIG['dim'], MODEL_CONFIG['dim'] * 4),
-            nn.GELU(),
-            nn.Dropout(MODEL_CONFIG.drop),
-            nn.Linear(MODEL_CONFIG['dim'] * 4, MODEL_CONFIG['dim'])
+        # Attention layer, expecting a 512-dimensional input
+        self.attention = nn.MultiheadAttention(
+            embed_dim=Config.dim,  # Kích thước của embedding
+            num_heads=Config.heads,
+            batch_first=True
         )
+        self.layer_norm = nn.LayerNorm(Config.dim)
+        self.dropout = nn.Dropout(Config.drop)
 
-    def forward(self, x):
-        return self.net(x)
+        # Linear layer để giảm kích thước sau khi ghép nối các đặc trưng
+        self.fc = nn.Linear(Config.dim * 2, Config.dim)  # Kích thước sau khi ghép nối sẽ là 1024, cần giảm lại thành 512
+
+    def forward(self, image_features, text_features):
+        # Đảm bảo đầu vào có đúng số chiều
+        if len(image_features.shape) == 1:
+            image_features = image_features.unsqueeze(0)
+        if len(text_features.shape) == 1:
+            text_features = text_features.unsqueeze(0)
+
+        # Ghép nối các đặc trưng ảnh và văn bản
+        combined = torch.cat([image_features, text_features], dim=-1)  # Kích thước sẽ là 1024
+
+        # Sử dụng lớp Linear để giảm kích thước từ 1024 xuống 512
+        combined = self.fc(combined)  # Kết quả sẽ có kích thước (batch_size, dim)
+
+        combined = combined.unsqueeze(1)  # Thêm chiều thứ 2 cho chuỗi
+
+        # Áp dụng cơ chế chú ý
+        attn_output, _ = self.attention(combined, combined, combined)
+
+        # Kết nối residual và chuẩn hóa lớp
+        output = self.layer_norm(combined + self.dropout(attn_output))
+
+        output = output.squeeze(1)  # Loại bỏ chiều chuỗi
+
+        return output

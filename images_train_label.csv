@@ -1,0 +1,111 @@
+Patient_id,images_path,Nhóm,Bệnh,Vị trí,Phương thức chụp,Điều trị,Tiến triển,Tính chất u
+CH230111022,train/u_xuong/Patient-Dang Hoai Khang-CH230111022/img-00216-00001.jpg,U xương,Sarcoma màng,Tay phải,CT,Hóa trị đợt 1,Không,Ác
+CH230111022,train/u_xuong/Patient-Dang Hoai Khang-CH230111022/img-00216-00115.jpg,U xương,Sarcoma màng,Tay phải,CT,Hóa trị đợt 1,Không,Ác
+CH230111022,train/u_xuong/Patient-Dang Hoai Khang-CH230111022/img-00219-00001.jpg,U xương,Sarcoma màng,Tay phải,X quang,Hóa trị đợt 1,Không,Ác
+CH230111022,train/u_xuong/Patient-Dang Hoai Khang-CH230111022/img-00221-00001.jpg,U xương,Sarcoma màng,Tay phải,X quang,Hóa trị đợt 1,Không,Ác
+CH230511606,train/u_xuong/Patient-Do Ngoc Phuong Nghi-CH230511606/img-00223-00001.jpg,U xương,Theo dõi sarcoma,Đầu thân trên chày trái,MRI,Không,Không,Ác
+CH230511606,train/u_xuong/Patient-Do Ngoc Phuong Nghi-CH230511606/img-00223-00003.jpg,U xương,Theo dõi sarcoma,Đầu thân trên chày trái,MRI,Không,Không,Ác
+CH230511606,train/u_xuong/Patient-Do Ngoc Phuong Nghi-CH230511606/img-00235-00005.jpg,U xương,Theo dõi sarcoma,Đầu thân trên chày trái,MRI,Không,Không,Ác
+CH230511606,train/u_xuong/Patient-Do Ngoc Phuong Nghi-CH230511606/img-00234-00007.jpg,U xương,Theo dõi sarcoma,Đầu thân trên chày trái,MRI,Không,Không,Ác
+CH230511606,train/u_xuong/Patient-Do Ngoc Phuong Nghi-CH230511606/img-00247-00001.jpg,U xương,Theo dõi sarcoma,Đầu thân trên chày trái,X quang,Không,Không,Ác
+CH230511606,train/u_xuong/Patient-Do Ngoc Phuong Nghi-CH230511606/img-00248-00001.jpg,U xương,Theo dõi sarcoma,Đầu thân trên chày trái,X quang,Không,Không,Ác
+CH230511606,train/u_xuong/Patient-Do Ngoc Phuong Nghi-CH230511606/img-00251-00001.jpg,U xương,Theo dõi sarcoma,Đầu thân trên chày trái,X quang,Không,Không,Ác
+CH230209832,train/u_xuong/Patient-Hang Kha Di-CH230209832/img-00255-00002.jpg,U xương,Sarcom tạo xương,Đầu thân trên xương mác trái,MRI,Đã mổ ở tuyến trước/hóa trị đợt 3,Tái phát,Ác
+CH230209832,train/u_xuong/Patient-Hang Kha Di-CH230209832/img-00255-00003.jpg,U xương,Sarcom tạo xương,Đầu thân trên xương mác trái,MRI,Đã mổ ở tuyến trước/hóa trị đợt 3,Tái phát,Ác
+CH230209832,train/u_xuong/Patient-Hang Kha Di-CH230209832/img-00255-00010.jpg,U xương,Sarcom tạo xương,Đầu thân trên xương mác trái,MRI,Đã mổ ở tuyến trước/hóa trị đợt 3,Tái phát,Ác
+CH230209832,train/u_xuong/Patient-Hang Kha Di-CH230209832/img-00256-00007.jpg,U xương,Sarcom tạo xương,Đầu thân trên xương mác trái,MRI,Đã mổ ở tuyến trước/hóa trị đợt 3,Tái phát,Ác
+CH230209832,train/u_xuong/Patient-Hang Kha Di-CH230209832/img-00256-00013.jpg,U xương,Sarcom tạo xương,Đầu thân trên xương mác trái,MRI,Đã mổ ở tuyến trước/hóa trị đợt 3,Tái phát,Ác
+CH230209832,train/u_xuong/Patient-Hang Kha Di-CH230209832/img-00257-00001.jpg,U xương,Sarcom tạo xương,Đầu thân trên xương mác trái,MRI,Đã mổ ở tuyến trước/hóa trị đợt 3,Tái phát,Ác
+CH230209832,train/u_xuong/Patient-Hang Kha Di-CH230209832/img-00260-00001.jpg,U xương,Sarcom tạo xương,Đầu thân trên xương mác trái,MRI,Đã mổ ở tuyến trước/hóa trị đợt 3,Tái phát,Ác
+CH230209832,train/u_xuong/Patient-Hang Kha Di-CH230209832/img-00260-00003.jpg,U xương,Sarcom tạo xương,Đầu thân trên xương mác trái,MRI,Đã mổ ở tuyến trước/hóa trị đợt 3,Tái phát,Ác
+CH230413349,train/u_xuong/Patient-Ho Ngoc Nhu-CH230413349/img-00268-00003.jpg,U xương,Bướu sợi không sinh xương,Đầu thân dưới đùi phải,CT,Mổ sinh thiết,Không,Lành
+CH230413349,train/u_xuong/Patient-Ho Ngoc Nhu-CH230413349/img-00268-00170.jpg,U xương,Bướu sợi không sinh xương,Đầu thân dưới đùi phải,CT,Mổ sinh thiết,Không,Lành
+CH230413349,train/u_xuong/Patient-Ho Ngoc Nhu-CH230413349/img-00268-00186.jpg,U xương,Bướu sợi không sinh xương,Đầu thân dưới đùi phải,CT,Mổ sinh thiết,Không,Lành
+CH230413349,train/u_xuong/Patient-Ho Ngoc Nhu-CH230413349/img-00270-00001.jpg,U xương,Bướu sợi không sinh xương,Đầu thân dưới đùi phải,X quang,Mổ sinh thiết,Không,Lành
+CH230413349,train/u_xuong/Patient-Ho Ngoc Nhu-CH230413349/img-00271-00001.jpg,U xương,Bướu sợi không sinh xương,Đầu thân dưới đùi phải,X quang,Mổ sinh thiết,Không,Lành
+CH220734171,train/u_xuong/Patient-Le Dinh Hoang Lai-CH220734171/img-00272-00001.jpg,U xương,Sarcom tạo xương,Đầu thân dưới đùi phải,CT,Đã mổ/hóa trị đợt 4,Nhập nhanh,Ác
+CH220734171,train/u_xuong/Patient-Le Dinh Hoang Lai-CH220734171/img-00272-00084.jpg,U xương,Sarcom tạo xương,Đầu thân dưới đùi phải,CT,Đã mổ/hóa trị đợt 4,Nhập nhanh,Ác
+CH220734171,train/u_xuong/Patient-Le Dinh Hoang Lai-CH220734171/img-00272-00185.jpg,U xương,Sarcom tạo xương,Đầu thân dưới đùi phải,CT,Đã mổ/hóa trị đợt 4,Nhập nhanh,Ác
+CH220734171,train/u_xuong/Patient-Le Dinh Hoang Lai-CH220734171/img-00272-00207.jpg,U xương,Sarcom tạo xương,Đầu thân dưới đùi phải,CT,Đã mổ/hóa trị đợt 4,Nhập nhanh,Ác
+CH220734171,train/u_xuong/Patient-Le Dinh Hoang Lai-CH220734171/img-00274-00001.jpg,U xương,Sarcom tạo xương,Đầu thân dưới đùi phải,X quang,Đã mổ/hóa trị đợt 4,Nhập nhanh,Ác
+CH220734171,train/u_xuong/Patient-Le Dinh Hoang Lai-CH220734171/img-00275-00001.jpg,U xương,Sarcom tạo xương,Đầu thân dưới đùi phải,X quang,Đã mổ/hóa trị đợt 4,Nhập nhanh,Ác
+CH220734171,train/u_xuong/Patient-Le Dinh Hoang Lai-CH220734171/img-00284-00001.jpg,U xương,Sarcom tạo xương,Đầu thân dưới đùi phải,X quang,Đã mổ/hóa trị đợt 4,Nhập nhanh,Ác
+CH201040321,train/u_xuong/Patient-Le Manh Hai-CH201040321/img-00312-00001.jpg,U xương,Sarcom tạo xương,Xương chày phải,CT,Đã mổ/hóa trị đợt 5,Không,Ác
+CH201040321,train/u_xuong/Patient-Le Manh Hai-CH201040321/img-00312-00071.jpg,U xương,Sarcom tạo xương,Xương chày phải,CT,Đã mổ/hóa trị đợt 5,Không,Ác
+CH201040321,train/u_xuong/Patient-Le Manh Hai-CH201040321/img-00312-00149.jpg,U xương,Sarcom tạo xương,Xương chày phải,CT,Đã mổ/hóa trị đợt 5,Không,Ác
+CH201040321,train/u_xuong/Patient-Le Manh Hai-CH201040321/img-00312-00230.jpg,U xương,Sarcom tạo xương,Xương chày phải,CT,Đã mổ/hóa trị đợt 5,Không,Ác
+CH201040321,train/u_xuong/Patient-Le Manh Hai-CH201040321/img-00314-00001.jpg,U xương,Sarcom tạo xương,Xương chày phải,X quang,Đã mổ/hóa trị đợt 5,Không,Ác
+CH201040321,train/u_xuong/Patient-Le Manh Hai-CH201040321/img-00314-00001.jpg,U xương,Sarcom tạo xương,Xương chày phải,X quang,Đã mổ/hóa trị đợt 5,Không,Ác
+CH230200661,train/u_xuong/Patient-Le Minh Ngoc-CH230200661/img-00326-00001.jpg,U xương,Sarcom tạo xương,Đầu dưới xương đùi trái,X quang,Đã mổ sinh thiết/hóa trị đợt 3,Không,Ác
+CH230200661,train/u_xuong/Patient-Le Minh Ngoc-CH230200661/img-00327-00001.jpg,U xương,Sarcom tạo xương,Đầu dưới xương đùi trái,X quang,Đã mổ sinh thiết/hóa trị đợt 3,Không,Ác
+CH230200661,train/u_xuong/Patient-Le Minh Ngoc-CH230200661/img-00328-00001.jpg,U xương,Sarcom tạo xương,Đầu dưới xương đùi trái,X quang,Đã mổ sinh thiết/hóa trị đợt 3,Không,Ác
+CH230200661,train/u_xuong/Patient-Le Minh Ngoc-CH230200661/img-00330-00001.jpg,U xương,Sarcom tạo xương,Đầu dưới xương đùi trái,X quang,Đã mổ sinh thiết/hóa trị đợt 3,Không,Ác
+CH190935058,train/u_xuong/Patient-Nguyen Ngoc Phuong-CH190935058/img-00333-00001.jpg,U xương,Sarcom sợi,Xương cánh chậu trái,CT,Đã mổ,Nghi ngờ di căn phổi,Ác
+CH190935058,train/u_xuong/Patient-Nguyen Ngoc Phuong-CH190935058/img-00333-00071.jpg,U xương,Sarcom sợi,Xương cánh chậu trái,CT,Đã mổ,Nghi ngờ di căn phổi,Ác
+CH190935058,train/u_xuong/Patient-Nguyen Ngoc Phuong-CH190935058/img-00333-00071.jpg,U xương,Sarcom sợi,Xương cánh chậu trái,CT,Đã mổ,Nghi ngờ di căn phổi,Ác
+CH190935058,train/u_xuong/Patient-Nguyen Ngoc Phuong-CH190935058/img-00333-00134.jpg,U xương,Sarcom sợi,Xương cánh chậu trái,CT,Đã mổ,Nghi ngờ di căn phổi,Ác
+CH190935058,train/u_xuong/Patient-Nguyen Ngoc Phuong-CH190935058/img-00334-00004.jpg,U xương,Sarcom sợi,Xương cánh chậu trái,CT,Đã mổ,Nghi ngờ di căn phổi,Ác
+CH190935058,train/u_xuong/Patient-Nguyen Ngoc Phuong-CH190935058/img-00334-00034.jpg,U xương,Sarcom sợi,Xương cánh chậu trái,CT,Đã mổ,Nghi ngờ di căn phổi,Ác
+CH190935058,train/u_xuong/Patient-Nguyen Ngoc Phuong-CH190935058/img-00334-00052.jpg,U xương,Sarcom sợi,Xương cánh chậu trái,CT,Đã mổ,Nghi ngờ di căn phổi,Ác
+CH230307793,train/u_xuong/Patient-Nguyen Phuong Thao Nguyen-CH230307793/img-00338-00001.jpg,U xương,Sarcom tạo xương,Đùi trái,X quang,Đã mổ sinh thiết,Không,Ác
+CH230307793,train/u_xuong/Patient-Nguyen Phuong Thao Nguyen-CH230307793/img-00339-00001.jpg,U xương,Sarcom tạo xương,Đùi trái,X quang,Đã mổ sinh thiết,Không,Ác
+CH230307793,train/u_xuong/Patient-Nguyen Phuong Thao Nguyen-CH230307793/img-00340-00001.jpg,U xương,Sarcom tạo xương,Đùi trái,X quang,Đã mổ sinh thiết,Không,Ác
+CH230307793,train/u_xuong/Patient-Nguyen Phuong Thao Nguyen-CH230307793/img-00341-00001.jpg,U xương,Sarcom tạo xương,Đùi trái,X quang,Đã mổ sinh thiết,Không,Ác
+CH230313852,train/u_xuong/Patient-Nguyen Thanh Nhat-CH230313852/img-00345-00001.jpg,U xương,Sarcom tạo xương,Đầu thân dưới đùi phải,X quang,Không,Không,Ác
+CH230313852,train/u_xuong/Patient-Nguyen Thanh Nhat-CH230313852/img-00346-00001.jpg,U xương,Sarcom tạo xương,Đầu thân dưới đùi phải,X quang,Không,Không,Ác
+CH230313852,train/u_xuong/Patient-Nguyen Thanh Nhat-CH230313852/img-00347-00001.jpg,U xương,Sarcom tạo xương,Đầu thân dưới đùi phải,X quang,Không,Không,Ác
+CH230313852,train/u_xuong/Patient-Nguyen Thanh Nhat-CH230313852/img-00349-00001.jpg,U xương,Sarcom tạo xương,Đầu thân dưới đùi phải,X quang,Không,Không,Ác
+CH230313852,train/u_xuong/Patient-Nguyen Thanh Nhat-CH230313852/img-00350-00001.jpg,U xương,Sarcom tạo xương,Đầu thân dưới đùi phải,X quang,Không,Không,Ác
+CH100802427,train/u_xuong/Patient-Nguyen Thi Sang-CH100802427/img-00351-00001.jpg,U xương,Sarcom tạo xương + gãy bệnh lý,Đầu dưới xương đùi trái,X quang,Đã mổ sinh thiết/hóa trị đợt 2,Không,Ác
+CH100802427,train/u_xuong/Patient-Nguyen Thi Sang-CH100802427/img-00352-00001.jpg,U xương,Sarcom tạo xương + gãy bệnh lý,Đầu dưới xương đùi trái,X quang,Đã mổ sinh thiết/hóa trị đợt 2,Không,Ác
+CH100802427,train/u_xuong/Patient-Nguyen Thi Sang-CH100802427/img-00354-00001.jpg,U xương,Sarcom tạo xương + gãy bệnh lý,Đầu dưới xương đùi trái,X quang,Đã mổ sinh thiết/hóa trị đợt 2,Không,Ác
+CH100802427,train/u_xuong/Patient-Nguyen Thi Sang-CH100802427/img-00357-00001.jpg,U xương,Sarcom tạo xương + gãy bệnh lý,Đầu dưới xương đùi trái,X quang,Đã mổ sinh thiết/hóa trị đợt 2,Không,Ác
+CH100802427,train/u_xuong/Patient-Nguyen Thi Sang-CH100802427/img-00358-00001.jpg,U xương,Sarcom tạo xương + gãy bệnh lý,Đầu dưới xương đùi trái,X quang,Đã mổ sinh thiết/hóa trị đợt 2,Không,Ác
+CH100802427,train/u_xuong/Patient-Nguyen Thi Sang-CH100802427/img-00359-00001.jpg,U xương,Sarcom tạo xương + gãy bệnh lý,Đầu dưới xương đùi trái,X quang,Đã mổ sinh thiết/hóa trị đợt 2,Không,Ác
+CH230200674,train/u_xuong/Patient-Thach Hoang Khang-CH230200674/img-00361-00001.jpg,Viêm nhiễm,Bướu phần mềm,Mông phải,MRI,Không,Không,
+CH221018242,train/u_xuong/Patient-Thai Thi Kim Quyen-CH221018242/img-00362-00006.jpg,U xương,Sarcom tạo xương,Gót chân phải,MRI,Đã mổ sinh thiết/hóa trị đợt 3,Không,Ác
+CH221018242,train/u_xuong/Patient-Thai Thi Kim Quyen-CH221018242/img-00362-00007.jpg,U xương,Sarcom tạo xương,Gót chân phải,MRI,Đã mổ sinh thiết/hóa trị đợt 3,Không,Ác
+CH221018242,train/u_xuong/Patient-Thai Thi Kim Quyen-CH221018242/img-00362-00009.jpg,U xương,Sarcom tạo xương,Gót chân phải,MRI,Đã mổ sinh thiết/hóa trị đợt 3,Không,Ác
+CH221018242,train/u_xuong/Patient-Thai Thi Kim Quyen-CH221018242/img-00365-00005.jpg,U xương,Sarcom tạo xương,Gót chân phải,MRI,Đã mổ sinh thiết/hóa trị đợt 3,Không,Ác
+CH221018242,train/u_xuong/Patient-Thai Thi Kim Quyen-CH221018242/img-00369-00016.jpg,U xương,Sarcom tạo xương,Gót chân phải,MRI,Đã mổ sinh thiết/hóa trị đợt 3,Không,Ác
+CH221018242,train/u_xuong/Patient-Thai Thi Kim Quyen-CH221018242/img-00369-00009.jpg,U xương,Sarcom tạo xương,Gót chân phải,MRI,Đã mổ sinh thiết/hóa trị đợt 3,Không,Ác
+CH221018242,train/u_xuong/Patient-Thai Thi Kim Quyen-CH221018242/img-00371-00001.jpg,U xương,Sarcom tạo xương,Gót chân phải,X quang,Đã mổ sinh thiết/hóa trị đợt 3,Không,Ác
+CH221018242,train/u_xuong/Patient-Thai Thi Kim Quyen-CH221018242/img-00372-00001.jpg,U xương,Sarcom tạo xương,Gót chân phải,X quang,Đã mổ sinh thiết/hóa trị đợt 3,Không,Ác
+CH221018242,train/u_xuong/Patient-Thai Thi Kim Quyen-CH221018242/img-00375-00001.jpg,U xương,Sarcom tạo xương,Gót chân phải,X quang,Đã mổ sinh thiết/hóa trị đợt 4,Không,Ác
+CH220811201,train/u_xuong/Patient-Thi Sieu-CH220811201/img-00377-00001.jpg,U xương,Bướu đại bào,Đầu dưới xương chày phải,MRI,Không,Không,Ác
+CH220811201,train/u_xuong/Patient-Thi Sieu-CH220811201/img-00379-00010.jpg,U xương,Bướu đại bào,Đầu dưới xương chày phải,MRI,Không,Không,Ác
+CH220811201,train/u_xuong/Patient-Thi Sieu-CH220811201/img-00379-00012.jpg,U xương,Bướu đại bào,Đầu dưới xương chày phải,MRI,Không,Không,Ác
+CH220811201,train/u_xuong/Patient-Thi Sieu-CH220811201/img-00381-00009.jpg,U xương,Bướu đại bào,Đầu dưới xương chày phải,MRI,Không,Không,Ác
+CH220811201,train/u_xuong/Patient-Thi Sieu-CH220811201/img-00387-00008.jpg,U xương,Bướu đại bào,Đầu dưới xương chày phải,MRI,Không,Không,Ác
+CH220811201,train/u_xuong/Patient-Thi Sieu-CH220811201/img-00398-00001.jpg,U xương,Bướu đại bào,Đầu dưới xương chày phải,X quang,Không,Không,Ác
+CH220811201,train/u_xuong/Patient-Thi Sieu-CH220811201/img-00399-00001.jpg,U xương,Bướu đại bào,Đầu dưới xương chày phải,X quang,Không,Không,Ác
+CH221213950,train/viem_nhiem/Patient-Chau Minh Oai-CH221213950/img-00001-00061.jpg,Viêm nhiễm,Viêm khớp + hủy xương ,Háng trái,CT,Không,Không,
+CH221213950,train/viem_nhiem/Patient-Chau Minh Oai-CH221213950/img-00001-00149.jpg,Viêm nhiễm,Viêm khớp + hủy xương ,Háng trái,CT,Không,Không,
+CH221213950,train/viem_nhiem/Patient-Chau Minh Oai-CH221213950/img-00003-00001.jpg,Viêm nhiễm,Viêm khớp + hủy xương ,Háng trái,X quang,Không,Không,
+CH221213950,train/viem_nhiem/Patient-Chau Minh Oai-CH221213950/img-00004-00001.jpg,Viêm nhiễm,Viêm khớp + hủy xương ,Háng trái,X quang,Không,Không,
+CH221213950,train/viem_nhiem/Patient-Chau Minh Oai-CH221213950/img-00007-00001.jpg,Viêm nhiễm,Viêm khớp + hủy xương ,Háng trái,X quang,Không,Không,
+CH220300284,train/viem_nhiem/Patient-Nguyen Thi Hoa-CH220300284/img-00011-00001.jpg,Viêm nhiễm,Viêm xương tủy + thoái hóa khớp gối,Đùi phải,X quang,Mổ 8 tuần,Không,
+CH220300284,train/viem_nhiem/Patient-Nguyen Thi Hoa-CH220300284/img-00016-00001.jpg,Viêm nhiễm,Viêm xương tủy + thoái hóa khớp gối,Đùi phải,X quang,Mổ 8 tuần,Không,
+CH230101532,train/viem_nhiem/Patient-Nguyen Thi Sim-CH230101532/img-00018-00001.jpg,Viêm nhiễm,Viêm khớp háng,Háng trái,X quang,Không,Không,
+CH230101532,train/viem_nhiem/Patient-Nguyen Thi Sim-CH230101532/img-00019-00001.jpg,Viêm nhiễm,Viêm khớp háng,Háng trái,X quang,Không,Không,
+CH230414634,train/viem_nhiem/Patient-Nguyen Van De-CH230414634/img-00021-00165.jpg,Viêm nhiễm,Viêm xương tủy,Đầu trên cánh tay phải,CT,Không,Tăng huyết áp,
+CH230414634,train/viem_nhiem/Patient-Nguyen Van De-CH230414634/img-00021-00052.jpg,Viêm nhiễm,Viêm xương tủy,Đầu trên cánh tay phải,CT,Không,Tăng huyết áp,
+CH230414634,train/viem_nhiem/Patient-Nguyen Van De-CH230414634/img-00022-00021.jpg,Viêm nhiễm,Viêm xương tủy,Đầu trên cánh tay phải,CT,Không,Tăng huyết áp,
+CH220805526,train/viem_nhiem/Patient-Phan Thi Lien-CH220805526/img-00024-00001.jpg,Viêm nhiễm,Viêm đa khớp,,X quang,Không,K di căn phổi,
+CH220805526,train/viem_nhiem/Patient-Phan Thi Lien-CH220805526/img-00025-00001.jpg,Viêm nhiễm,Viêm đa khớp,,X quang,Không,K di căn phổi,
+CH220805525,train/viem_nhiem/Patient-Phan Thi Lien-CH220805526/img-00026-00001.jpg,Viêm nhiễm,Viêm đa khớp,,X quang,Không,K di căn phổi,
+CH220805526,train/viem_nhiem/Patient-Phan Thi Lien-CH220805526/img-00027-00001.jpg,Viêm nhiễm,Viêm đa khớp,,X quang,Không,K di căn phổi,
+CH230416770,train/viem_nhiem/Patient-Tran Ngoc Bich Tram-CH230416770/img-00028-00001.jpg,Viêm nhiễm,Viêm xương đùi mãn tính,Đùi phải,X quang,Không,Không,
+CH230416770,train/viem_nhiem/Patient-Tran Ngoc Bich Tram-CH230416770/img-00029-00001.jpg,Viêm nhiễm,Viêm xương đùi mãn tính,Đùi phải,X quang,Không,Không,
+CH230416770,train/viem_nhiem/Patient-Tran Ngoc Bich Tram-CH230416770/img-00030-00001.jpg,Viêm nhiễm,Viêm xương đùi mãn tính,Đùi phải,X quang,Không,Không,
+CH230416770,train/viem_nhiem/Patient-Tran Ngoc Bich Tram-CH230416770/img-00031-00001.jpg,Viêm nhiễm,Viêm xương đùi mãn tính,Đùi phải,X quang,Không,Không,
+CH221211848,train/chan_thuong/Patient-Dang Thi Mong Tuyen-CH221211848/img-00003-00001.jpg,Chấn thương,Gãy bệnh lý do bướu đại bào xương,1/3 xương cánh tay trái,X quang,Đã mổ sinh thiết,Loạn sản sợi,
+CH221211848,train/chan_thuong/Patient-Dang Thi Mong Tuyen-CH221211848/img-00005-00001.jpg,Chấn thương,Gãy bệnh lý do bướu đại bào xương,1/3 xương cánh tay trái,X quang,Đã mổ sinh thiết,Loạn sản sợi,
+CH221211848,train/chan_thuong/Patient-Dang Thi Mong Tuyen-CH221211848/img-00007-00001.jpg,Chấn thương,Gãy bệnh lý do bướu đại bào xương,1/3 xương cánh tay trái,X quang,Đã mổ sinh thiết,Loạn sản sợi,
+CH221211858,train/chan_thuong/Patient-Dang Thi Mong Tuyen-CH221211848/img-00011-00001.jpg,Chấn thương,Gãy bệnh lý do bướu đại bào xương,1/3 xương cánh tay trái,X quang,Đã mổ sinh thiết,Loạn sản sợi,
+CH230319517,train/chan_thuong/Patient-Do Thi Kiem-CH230319517/img-00022-00008.jpg,U xương,K di căn + gãy bệnh lý,Xương chậu phải,MRI,Không,,Ác
+CH230319517,train/chan_thuong/Patient-Do Thi Kiem-CH230319517/img-00026-00008.jpg,U xương,K di căn + gãy bệnh lý,Xương chậu phải,MRI,Không,,Ác
+CH230319517,train/chan_thuong/Patient-Do Thi Kiem-CH230319517/img-00041-00001.jpg,U xương,K di căn + gãy bệnh lý,Xương chậu phải,X quang,Không,,Ác
+CH190403633,train/chan_thuong/Patient-Quach Dang Thanh-CH190403633/img-00044-00070.jpg,U xương,K di căn + dải gãy xương,Đùi trái,CT,Không,,Ác
+CH190403633,train/chan_thuong/Patient-Quach Dang Thanh-CH190403633/img-00044-00102.jpg,U xương,K di căn + dải gãy xương,Đùi trái,CT,Không,,Ác
+CH190403633,train/chan_thuong/Patient-Quach Dang Thanh-CH190403633/img-00047-00001.jpg,U xương,K di căn + dải gãy xương,Đùi trái,CT,Không,,Ác

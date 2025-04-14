@@ -1,23 +1,33 @@
+# [file name]: text_encoder.py
+import torch
 import torch.nn as nn
-from transformers import AutoModel
-from configs.config import MODEL_CONFIG
+from transformers import AutoModel, AutoTokenizer
+from Configs.config import Config
 
-class PhoBERTTextEncoder(nn.Module):
+class TextEncoder(nn.Module):
     def __init__(self):
         super().__init__()
-        self.model = AutoModel.from_pretrained(MODEL_CONFIG['text_model'])
-        self.proj = nn.Linear(768, MODEL_CONFIG['dim'])
-        self.norm = nn.LayerNorm(MODEL_CONFIG['dim'])
-        self.dropout = nn.Dropout(MODEL_CONFIG['drop'])
+        # Load PhoBERT model and tokenizer
+        self.phobert = AutoModel.from_pretrained("vinai/phobert-base")
+        self.tokenizer = AutoTokenizer.from_pretrained("vinai/phobert-base")
+
+        # Projection layer to match image feature dimension
+        self.proj = nn.Sequential(
+            nn.Linear(768, Config.dim),
+            nn.ReLU(),
+            nn.Dropout(Config.drop)
+        )
+
+        # Freeze PhoBERT layers if needed
+        if Config.freeze_text_encoder:
+            for param in self.phobert.parameters():
+                param.requires_grad = False
 
     def forward(self, input_ids, attention_mask):
-        outputs = self.model(
+        outputs = self.phobert(
             input_ids=input_ids,
             attention_mask=attention_mask
         )
-        # Lấy embedding của token [CLS]
-        text_features = outputs.last_hidden_state[:, 0, :]
-        text_features = self.proj(text_features)
-        text_features = self.norm(text_features)
-        text_features = self.dropout(text_features)
-        return text_features.unsqueeze(1)  # Thêm dimension để phù hợp với image features
+        # Use [CLS] token representation
+        pooled_output = outputs.last_hidden_state[:, 0]
+        return self.proj(pooled_output)

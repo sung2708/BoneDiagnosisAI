@@ -1,0 +1,13 @@
+Patient_id,images_path,Nhóm,Bệnh,Vị trí,Phương thức chụp,Điều trị,Tiến triển,Tính chất u
+CH220837391,valid/u_xuong/Patient-Tran Minh Khoi-CH220837391/img-00400-00001.jpg,U xương,Sarcom tạo xương,1/3 dưới xương đùi trái,X quang,Tháo khớp háng + hóa trị đặt 3,Không,Ác
+CH220837391,valid/u_xuong/Patient-Tran Minh Khoi-CH220837391/img-00401-00001.jpg,U xương,Sarcom tạo xương,1/3 dưới xương đùi trái,X quang,Tháo khớp háng + hóa trị đặt 4,Không,Ác
+CH230201566,valid/u_xuong/Patient-Tran Van Sao-CH230201566/img-00402-00054.jpg,U xương,Bướu đại bào + gãy xương bệnh lý,Dưới xương đùi trái,CT,Đã mổ sinh thiết,Không,Ác
+CH230201566,valid/u_xuong/Patient-Tran Van Sao-CH230201566/img-00402-00183.jpg,U xương,Bướu đại bào + gãy xương bệnh lý,Dưới xương đùi trái,CT,Đã mổ sinh thiết,Không,Ác
+CH230201566,valid/u_xuong/Patient-Tran Van Sao-CH230201566/img-00402-00217.jpg,U xương,Bướu đại bào + gãy xương bệnh lý,Dưới xương đùi trái,CT,Đã mổ sinh thiết,Không,Ác
+CH230201566,valid/u_xuong/Patient-Tran Van Sao-CH230201566/img-00405-00001.jpg,U xương,Bướu đại bào + gãy xương bệnh lý,Dưới xương đùi trái,X quang,Đã mổ sinh thiết,Không,Ác
+CH230201566,valid/u_xuong/Patient-Tran Van Sao-CH230201566/img-00407-00001.jpg,U xương,Bướu đại bào + gãy xương bệnh lý,Dưới xương đùi trái,X quang,Đã mổ sinh thiết,Không,Ác
+CH230201566,valid/u_xuong/Patient-Tran Van Sao-CH230201566/img-00408-00001.jpg,U xương,Bướu đại bào + gãy xương bệnh lý,Dưới xương đùi trái,X quang,Đã mổ sinh thiết,Không,Ác
+CH230201566,valid/u_xuong/Patient-Tran Van Sao-CH230201566/img-00413-00001.jpg,U xương,Bướu đại bào + gãy xương bệnh lý,Dưới xương đùi trái,X quang,Đã mổ sinh thiết,Không,Ác
+CH230510951,valid/viem_nhiem/Patient-Tran Thi Dan-CH230510951/img-00032-00001.jpg,Viêm nhiễm,Viêm xương tủy,1/3 dưới xương đùi trái,X quang,Không,Nhiễm trùng huyết + viêm phổi,
+CH230510951,valid/viem_nhiem/Patient-Tran Thi Dan-CH230510951/img-00033-00001.jpg,Viêm nhiễm,Viêm xương tủy,1/3 dưới xương đùi trái,X quang,Không,Nhiễm trùng huyết + viêm phổi,
+CH230510951,valid/viem_nhiem/Patient-Tran Thi Dan-CH230510951/img-00033-00001.jpg,Viêm nhiễm,Viêm xương tủy,1/3 dưới xương đùi trái,X quang,Không,Nhiễm trùng huyết + viêm phổi,
